@@ -4,26 +4,38 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>굿즈샵</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=2"></script>
   <script src="https://js.tosspayments.com/v1/payment"></script>
 </head>
 <body>
   <header id="header"></header>
   <section class="hero">
     <div class="inner">
-      <p class="tag">NEW 굿즈 컬렉션</p>
-      <h1>매일을 특별하게 만드는<br>나만의 굿즈</h1>
-      <p class="sub">가입하고 바로 구매하세요. 간편하고 안전한 카드 결제를 지원합니다.</p>
-      <a class="btn" href="#products">상품 둘러보기</a>
+      <div class="copy">
+        <p class="tag">NEW 굿즈 컬렉션</p>
+        <h1>매일을 특별하게 만드는<br>나만의 굿즈</h1>
+        <p class="sub">가입하고 바로 구매하세요. 간편하고 안전한 카드 결제를 지원합니다.</p>
+        <div class="btns">
+          <a class="btn" href="#products">상품 둘러보기</a>
+          <a class="btn ghost" href="login.html">무료 가입</a>
+        </div>
+      </div>
+      <div class="visual" id="visual"></div>
     </div>
   </section>
+  <section class="perks">
+    <div><b>이메일 인증 없이 가입</b><span>가입하면 바로 쇼핑 시작</span></div>
+    <div><b>안전한 카드 결제</b><span>토스페이먼츠로 간편하게</span></div>
+    <div><b>내 결제 내역 확인</b><span>주문 기록을 언제든 조회</span></div>
+  </section>
   <main id="products">
-    <h2 class="section">전체 상품</h2>
+    <div class="section-head"><h2>전체 상품</h2><span id="count"></span></div>
     <p class="msg" id="msg"></p>
     <div class="grid" id="grid"></div>
   </main>
+  <footer class="foot">© 굿즈샵 · 토스페이먼츠 테스트 결제로 운영됩니다 (실제 청구 없음)</footer>
   <script>
     renderHeader();
     let products = [];
@@ -33,6 +45,8 @@
       const { data, error } = await sb.from('products').select('*').order('id');
       if (error) { document.getElementById('msg').textContent = '상품을 불러오지 못했습니다'; return; }
       products = data;
+      document.getElementById('count').textContent = '총 ' + products.length + '개';
+      document.getElementById('visual').innerHTML = products.slice(0, 3).map((p) => '<img src="' + p.image_url + '" alt="">').join('');
       document.getElementById('grid').innerHTML = products.map((p) =>
         '<div class="card"><img src="' + p.image_url + '" alt="' + p.name.replace(/"/g, '&quot;') + '" loading="lazy">' +
         '<div class="body"><h2 class="name">' + p.name + '</h2>' +
