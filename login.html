@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>로그인 - 굿즈샵</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="app.js"></script>
+  <style>
+    .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+    .tabs button { flex: 1; min-height: 44px; font: inherit; background: #eef0f3; border: 0; border-radius: 10px; cursor: pointer; }
+    .tabs button.on { background: #3182f6; color: #fff; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <header id="header"></header>
+  <main>
+    <div class="box">
+      <div class="tabs">
+        <button id="tab-login" class="on" type="button">로그인</button>
+        <button id="tab-signup" type="button">회원가입</button>
+      </div>
+      <label>이메일<input id="email" type="email" autocomplete="email"></label>
+      <label>비밀번호 (6자 이상)<input id="password" type="password" autocomplete="current-password"></label>
+      <p class="msg" id="msg"></p>
+      <button class="primary" id="submit" type="button">로그인</button>
+    </div>
+  </main>
+  <script>
+    renderHeader();
+    let mode = 'login'; // 'login' 또는 'signup'
+    const $ = (id) => document.getElementById(id);
+
+    // 탭 전환
+    function setMode(m) {
+      mode = m;
+      $('tab-login').className = m === 'login' ? 'on' : '';
+      $('tab-signup').className = m === 'signup' ? 'on' : '';
+      $('submit').textContent = m === 'login' ? '로그인' : '회원가입';
+      $('msg').textContent = '';
+    }
+    $('tab-login').onclick = () => setMode('login');
+    $('tab-signup').onclick = () => setMode('signup');
+
+    $('submit').onclick = async () => {
+      const email = $('email').value.trim();
+      const password = $('password').value;
+      const msg = $('msg');
+      msg.textContent = '';
+      if (!email || password.length < 6) {
+        msg.textContent = '이메일을 입력하고 비밀번호는 6자 이상으로 입력하세요';
+        return;
+      }
+      $('submit').disabled = true;
+      let error, session;
+      if (mode === 'signup') {
+        const r = await sb.auth.signUp({ email, password });
+        error = r.error;
+        session = r.data && r.data.session;
+        if (!error && !session) { // 세션이 없으면 바로 로그인
+          const r2 = await sb.auth.signInWithPassword({ email, password });
+          error = r2.error;
+        }
+      } else {
+        const r = await sb.auth.signInWithPassword({ email, password });
+        error = r.error;
+      }
+      $('submit').disabled = false;
+      if (error) {
+        const m = error.message || '';
+        if (/already registered/i.test(m)) msg.textContent = '이미 가입된 이메일입니다';
+        else if (/at least 6/i.test(m)) msg.textContent = '비밀번호는 6자 이상이어야 합니다';
+        else if (/invalid login/i.test(m)) msg.textContent = '이메일 또는 비밀번호가 올바르지 않습니다';
+        else msg.textContent = mode === 'login' ? '이메일 또는 비밀번호가 올바르지 않습니다' : '가입에 실패했습니다: ' + m;
+        return;
+      }
+      location.href = 'index.html';
+    };
+  </script>
+</body>
+</html>

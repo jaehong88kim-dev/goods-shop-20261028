@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>결제 확인 - 굿즈샵</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="app.js"></script>
+</head>
+<body>
+  <header id="header"></header>
+  <main>
+    <div class="box">
+      <p id="status">결제 확인 중...</p>
+      <a class="primary" id="link" href="orders.html" style="display:none">내 결제 내역 보기</a>
+    </div>
+  </main>
+  <script>
+    renderHeader();
+    (async () => {
+      const q = new URLSearchParams(location.search);
+      const status = document.getElementById('status');
+      const user = await requireLogin();
+      if (!user) return;
+      const { data } = await sb.auth.getSession();
+      try {
+        // 서버(Edge Function)에서 결제 승인 (새로고침해도 안전)
+        const res = await fetch(SUPABASE_URL + '/functions/v1/confirm-payment', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + data.session.access_token,
+            'apikey': SUPABASE_ANON_KEY,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            paymentKey: q.get('paymentKey'),
+            orderId: q.get('orderId'),
+            amount: Number(q.get('amount'))
+          })
+        });
+        const result = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          status.textContent = result.error || '결제 확인에 실패했습니다';
+          return;
+        }
+        status.textContent = '결제가 완료되었습니다';
+        document.getElementById('link').style.display = 'inline-flex';
+      } catch (e) {
+        status.textContent = '결제 확인 중 오류가 발생했습니다';
+      }
+    })();
+  </script>
+</body>
+</html>

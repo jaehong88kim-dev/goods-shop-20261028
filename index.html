@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>굿즈샵</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="app.js"></script>
+  <script src="https://js.tosspayments.com/v1/payment"></script>
+</head>
+<body>
+  <header id="header"></header>
+  <main>
+    <h1>상품</h1>
+    <p class="msg" id="msg"></p>
+    <div class="grid" id="grid"></div>
+  </main>
+  <script>
+    renderHeader();
+    let products = [];
+
+    // 상품 불러와서 카드로 그리기
+    async function load() {
+      const { data, error } = await sb.from('products').select('*').order('id');
+      if (error) { document.getElementById('msg').textContent = '상품을 불러오지 못했습니다'; return; }
+      products = data;
+      document.getElementById('grid').innerHTML = products.map((p) =>
+        '<div class="card"><img src="' + p.image_url + '" alt="' + p.name.replace(/"/g, '&quot;') + '" loading="lazy">' +
+        '<div class="body"><h2 class="name">' + p.name + '</h2>' +
+        '<p class="price">' + won(p.price) + '</p>' +
+        '<button class="primary" data-id="' + p.id + '">구매하기</button></div></div>'
+      ).join('');
+    }
+
+    // 구매하기 클릭
+    document.getElementById('grid').onclick = async (e) => {
+      const btn = e.target.closest('button[data-id]');
+      if (!btn) return;
+      const product = products.find((p) => String(p.id) === btn.dataset.id);
+      const { data } = await sb.auth.getSession();
+      if (!data.session) { location.href = 'login.html'; return; }
+      try {
+        await TossPayments(TOSS_CLIENT_KEY).requestPayment('카드', {
+          amount: product.price,
+          orderId: 'P' + product.id + '_' + Date.now(),
+          orderName: product.name,
+          successUrl: new URL('success.html', location.href).href,
+          failUrl: new URL('fail.html', location.href).href
+        });
+      } catch (err) {
+        // 사용자가 결제창을 닫은 경우 등은 조용히 무시
+      }
+    };
+
+    load();
+  </script>
+</body>
+</html>

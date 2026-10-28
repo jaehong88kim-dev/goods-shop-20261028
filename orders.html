@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내 결제 내역</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .order { padding: 14px; margin-bottom: 12px; }
+  .order p { margin: 0 0 4px; }
+  .order .date { color: #666; }
+  .empty { padding: 24px 0; text-align: center; }
+  .empty a { display: inline-flex; align-items: center; min-height: 44px; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<header id="header"></header>
+<main>
+  <h1>내 결제 내역</h1>
+  <div id="list">불러오는 중...</div>
+</main>
+<script>
+  // 내 결제 내역을 불러와 카드로 보여줍니다
+  async function load() {
+    renderHeader();
+    const user = await requireLogin();
+    if (!user) return;
+    const list = document.getElementById('list');
+    const { data, error } = await sb.from('orders')
+      .select('id, amount, status, created_at, products(name)')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    if (error) { list.textContent = '불러오지 못했습니다'; return; }
+    if (!data.length) {
+      list.innerHTML = '<div class="empty"><p>결제 내역이 없습니다</p><a href="index.html">상품 보러 가기</a></div>';
+      return;
+    }
+    list.innerHTML = '';
+    data.forEach((o) => {
+      const div = document.createElement('div');
+      div.className = 'card order';
+      const name = o.products ? o.products.name : '-';
+      const status = o.status === 'paid' ? '결제완료' : o.status;
+      // textContent로 넣어 안전하게 표시
+      [['date', new Date(o.created_at).toLocaleString('ko-KR')], ['', name], ['', won(o.amount)], ['', status]].forEach(([c, t]) => {
+        const p = document.createElement('p');
+        if (c) p.className = c;
+        p.textContent = t;
+        div.appendChild(p);
+      });
+      list.appendChild(div);
+    });
+  }
+  load();
+</script>
+</body>
+</html>

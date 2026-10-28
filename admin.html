@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>관리자 - 전체 결제 내역</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .sum { margin: 0 0 12px; font-weight: 700; }
+  .deny a { display: inline-flex; align-items: center; min-height: 44px; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<header id="header"></header>
+<main>
+  <h1>전체 결제 내역</h1>
+  <div id="content">불러오는 중...</div>
+</main>
+<script>
+  // 표 칸 하나를 안전하게 만듭니다
+  function td(tr, text) {
+    const c = document.createElement('td');
+    c.textContent = text;
+    tr.appendChild(c);
+  }
+
+  async function load() {
+    const user = await requireLogin();
+    if (!user) return;
+    const { isAdmin } = await renderHeader();
+    const box = document.getElementById('content');
+    // 관리자가 아니면 조회하지 않습니다
+    if (!isAdmin) {
+      box.innerHTML = '<p class="deny">관리자만 볼 수 있습니다</p><a href="index.html">홈으로</a>';
+      return;
+    }
+    const { data, error } = await sb.from('orders')
+      .select('id, amount, status, created_at, user_email, products(name)')
+      .order('created_at', { ascending: false });
+    if (error) { box.textContent = '불러오지 못했습니다'; return; }
+    const total = data.reduce((s, o) => s + Number(o.amount), 0);
+    box.innerHTML = '<p class="sum">총 ' + data.length + '건 / ' + won(total) + '</p>' +
+      '<div class="table-wrap"><table><thead><tr><th>날짜</th><th>이메일</th><th>상품</th><th>금액</th><th>상태</th></tr></thead><tbody id="rows"></tbody></table></div>';
+    const rows = document.getElementById('rows');
+    data.forEach((o) => {
+      const tr = document.createElement('tr');
+      td(tr, new Date(o.created_at).toLocaleString('ko-KR'));
+      td(tr, o.user_email || '-');
+      td(tr, o.products ? o.products.name : '-');
+      td(tr, won(o.amount));
+      td(tr, o.status === 'paid' ? '결제완료' : o.status);
+      rows.appendChild(tr);
+    });
+  }
+  load();
+</script>
+</body>
+</html>

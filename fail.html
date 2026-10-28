@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>결제 실패 - 굿즈샵</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="app.js"></script>
+</head>
+<body>
+  <header id="header"></header>
+  <main>
+    <div class="box">
+      <h1>결제에 실패했습니다</h1>
+      <p class="msg" id="msg"></p>
+      <a class="primary" href="index.html">상품 목록으로</a>
+    </div>
+  </main>
+  <script>
+    renderHeader();
+    // 토스가 보낸 message 표시 (textContent라 안전)
+    document.getElementById('msg').textContent =
+      new URLSearchParams(location.search).get('message') || '결제가 취소되었거나 실패했습니다';
+  </script>
+</body>
+</html>

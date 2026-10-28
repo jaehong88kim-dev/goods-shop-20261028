@@ -1,0 +1,25 @@
+/* 모바일 기준으로 먼저 작성, 큰 화면은 아래 @media 에서 넓힙니다 */
+* { box-sizing: border-box; }
+body { margin: 0; font: 16px/1.5 -apple-system, 'Malgun Gothic', sans-serif; color: #222; background: #f6f7f9; }
+header { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 0 16px; min-height: 56px; background: #fff; border-bottom: 1px solid #e3e5e8; }
+header .logo { font-weight: 700; font-size: 18px; color: #222; text-decoration: none; }
+header nav { display: flex; gap: 4px; }
+header nav a, header nav button { display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; font: inherit; color: #222; background: none; border: 0; text-decoration: none; cursor: pointer; }
+main { max-width: 1100px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 22px; margin: 8px 0 16px; }
+.grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.card img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; background: #eee; }
+.card .body { padding: 12px 14px 14px; }
+.card .name { margin: 0 0 6px; font-size: 16px; }
+.card .price { margin: 0 0 10px; font-weight: 700; }
+button.primary, a.primary { display: inline-flex; justify-content: center; align-items: center; width: 100%; min-height: 48px; padding: 0 16px; font: inherit; font-weight: 700; color: #fff; background: #3182f6; border: 0; border-radius: 10px; text-decoration: none; cursor: pointer; }
+input { width: 100%; min-height: 48px; margin: 6px 0 12px; padding: 0 12px; font: inherit; border: 1px solid #ccd0d5; border-radius: 10px; }
+.box { max-width: 420px; margin: 24px auto; padding: 20px; background: #fff; border-radius: 12px; }
+.msg { min-height: 24px; color: #d33; }
+.table-wrap { overflow-x: auto; background: #fff; border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; min-width: 520px; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; white-space: nowrap; }
+@media (min-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 900px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1200px) { .grid { grid-template-columns: repeat(4, 1fr); } }
