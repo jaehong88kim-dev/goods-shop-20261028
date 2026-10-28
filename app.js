@@ -2,7 +2,7 @@
 // (anon 키와 토스 클라이언트 키는 공개되어도 안전한 키입니다)
 const SUPABASE_URL = 'https://zlzolpvwxhjrbkuixfmr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsem9scHZ3eGhqcmJrdWl4Zm1yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxMjU2MjEsImV4cCI6MjEwODcwMTYyMX0.Nh_TJ9PaKyuQ9lzG7dW9vpj7UFSUqOpLqcbz4m3crys';
-const TOSS_CLIENT_KEY = 'test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq';
+const TOSS_CLIENT_KEY = 'test_ck_DnyRpQWGrNzZzn1M90Q0rKwv1M9E';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
