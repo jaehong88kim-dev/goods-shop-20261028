@@ -8,15 +8,17 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="app.js"></script>
   <style>
-    .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-    .tabs button { flex: 1; min-height: 44px; font: inherit; background: #eef0f3; border: 0; border-radius: 10px; cursor: pointer; }
-    .tabs button.on { background: #3182f6; color: #fff; font-weight: 700; }
+    .tabs { display: flex; gap: 4px; margin-bottom: 24px; padding: 4px; background: #f2f4f6; border-radius: 12px; }
+    .tabs button { flex: 1; min-height: 44px; font: inherit; color: #6b7684; background: none; border: 0; border-radius: 10px; cursor: pointer; }
+    .tabs button.on { color: #191f28; background: #fff; font-weight: 700; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
   </style>
 </head>
 <body>
   <header id="header"></header>
   <main>
     <div class="box">
+      <h1 id="title">다시 만나서 반가워요</h1>
+      <p class="lead" id="lead">로그인하고 쇼핑을 이어가세요</p>
       <div class="tabs">
         <button id="tab-login" class="on" type="button">로그인</button>
         <button id="tab-signup" type="button">회원가입</button>
@@ -38,6 +40,8 @@
       $('tab-login').className = m === 'login' ? 'on' : '';
       $('tab-signup').className = m === 'signup' ? 'on' : '';
       $('submit').textContent = m === 'login' ? '로그인' : '회원가입';
+      $('title').textContent = m === 'login' ? '다시 만나서 반가워요' : '처음 오셨나요?';
+      $('lead').textContent = m === 'login' ? '로그인하고 쇼핑을 이어가세요' : '이메일만 있으면 바로 시작할 수 있어요';
       $('msg').textContent = '';
     }
     $('tab-login').onclick = () => setMode('login');

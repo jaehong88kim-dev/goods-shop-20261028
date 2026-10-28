@@ -30,7 +30,7 @@ async function renderHeader() {
   const links = ['<a href="index.html">상품</a>'];
   if (user) links.push('<a href="orders.html">내 결제</a>');
   if (isAdmin) links.push('<a href="admin.html">관리자</a>');
-  links.push(user ? '<button id="logout">로그아웃</button>' : '<a href="login.html">로그인</a>');
+  links.push(user ? '<button id="logout">로그아웃</button>' : '<a class="cta" href="login.html">로그인</a>');
   document.getElementById('header').innerHTML = '<a class="logo" href="index.html">굿즈샵</a><nav>' + links.join('') + '</nav>';
   const out = document.getElementById('logout');
   if (out) out.onclick = async () => { await sb.auth.signOut(); location.href = 'index.html'; };
