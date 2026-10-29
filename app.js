@@ -36,3 +36,41 @@ async function renderHeader() {
   if (out) out.onclick = async () => { await sb.auth.signOut(); location.href = 'index.html'; };
   return { user, isAdmin };
 }
+
+// 서비스워커 등록: 방문한 페이지를 저장해 두었다가 오프라인에서도 보여줍니다.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+
+// 안드로이드 크롬이 보내주는 "설치 가능" 신호를 잡아 둡니다.
+let installEvent = null;
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvent = e; });
+
+// 모바일에서 처음 방문했을 때 "홈 화면에 추가" 안내를 딱 한 번 보여줍니다.
+function showInstallTip() {
+  const installed = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  if (installed || !matchMedia('(pointer: coarse)').matches) return;
+  try { if (localStorage.getItem('installTipShown')) return; } catch (e) {}
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  setTimeout(() => {
+    if (!ios && !installEvent) return; // 설치 방법을 안내할 수 없는 브라우저
+    try { localStorage.setItem('installTipShown', '1'); } catch (e) {}
+    const tip = document.createElement('div');
+    tip.className = 'install-tip';
+    const text = document.createElement('p');
+    text.textContent = ios ? '아래 공유 버튼을 누르고 "홈 화면에 추가"를 선택하면 앱처럼 쓸 수 있어요' : '홈 화면에 추가하면 앱처럼 빠르게 열 수 있어요';
+    tip.appendChild(text);
+    if (installEvent) {
+      const go = document.createElement('button');
+      go.className = 'go';
+      go.textContent = '설치';
+      go.onclick = () => { installEvent.prompt(); installEvent = null; tip.remove(); };
+      tip.appendChild(go);
+    }
+    const close = document.createElement('button');
+    close.textContent = '닫기';
+    close.onclick = () => tip.remove();
+    tip.appendChild(close);
+    document.body.appendChild(tip);
+  }, 2500);
+}
